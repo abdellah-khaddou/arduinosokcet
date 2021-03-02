@@ -17,9 +17,9 @@ const io = require('socket.io')(http,{
 
 var start = true;
 
-var arduinoInside,arduinoOutside;
+var arduinoInside = "0,00,0000,0000",arduinoOutside="0,0,0000";
 var inside  = {led:0,redou:0,temp:0,humd:0}
-var outside = {roboni:0,humd:0,chta:0}
+var outside = {roboni:0,rain:0,torba:0}
 var mqtt = require('mqtt');
 var count = 0;
 var hasIndarChange = true;
@@ -41,7 +41,7 @@ client.on('message', function (topic, message, packet) {
       publish("indar", arduinoInside, {});
       let data = JSON.stringify({arduinoInside,arduinoOutside})
       io.emit('phone', data);
-    }else if(topic=="home"){//inside fe ldakhel dyal dar jat data
+    }else if(topic=="inside"){//inside fe ldakhel dyal dar jat data
       arduinoInside =message;
       traitementInside(arduinoInside);
       let data = JSON.stringify({arduinoInside,arduinoOutside})
@@ -85,7 +85,7 @@ function publish(topic, msg, options) {
 var message = "test message";
 console.log("subscribing to topics");
 
-client.subscribe("home", { }); //topic list
+client.subscribe("inside", { }); //topic list
 client.subscribe("outside", { }); //topic list
 client.subscribe("phone", { }); //topic list
 
@@ -126,7 +126,7 @@ io.on('connection', (socket) => {
     arduinoInside = ins.led +","+ ins.redou+","+ins.temp+","+ins.humd;
     arduinoOutside = out.roboni+","+out.rain+","+out.torba;
     publish("indar", arduinoInside, {});
-    //publish("outdar", arduinoOutside, {});
+    publish("outdar", arduinoOutside, {});
     console.log("obj",myobject);
     console.log('message: ' + JSON.stringify(msg));
 
@@ -164,17 +164,20 @@ function traitementInside(insidex){
 
 function traitementOutside(outsidex,insidex){
   if(outsidex){
+    console.log("out: ",outside,"obbb",outsidex);
     let x     = outsidex.split(',');
     outside.roboni = parseInt(x[0]);
-    outside.chta  = parseInt(x[2]);
-    let humd  = parseInt(x[1]);
-    outside.humd = humd = humd>=1000 ? humd -1000 : -humd;
-    if(chta ==1){
+    outside.rain  = parseInt(x[1]);
+    let humd  = parseInt(x[2]);
+    outside.torba = humd ;
+    if(outside.rain ==1){
+      console.log("yy",insidex)
       let y     = insidex.split(',');
-      Y[0]=1;
-      y[1]=99;
+      y[0]=1;
+      y[1]=0;
       y.join(',');
-      return y;
+      console.log('y',y.toString());
+      return y.toString();
     }
 
   }
