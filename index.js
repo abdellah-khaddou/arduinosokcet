@@ -108,9 +108,9 @@ console.log("end of script");
 
 
 
-// app.get('/', (req, res) => {
-//   res.sendFile(__dirname + '/client.html');
-// });
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/client.html');
+});
 client.on("connect", function () {
   console.log("connected  " + client.connected);
    // hadi bach ghir ibda ijib data mn arduino bach itlab mn arduino i3tih data
